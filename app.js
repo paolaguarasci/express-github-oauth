@@ -11,7 +11,7 @@ const partials = require("express-partials")
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET
-const GITHUB_CALLBACK_URL = `http://${process.env.OSM_URL}:${process.env.OSM_PORT}/auth/github/callback`
+const GITHUB_CALLBACK_URL = `http://${process.env.OSM_IP}:${process.env.OSM_PORT}/auth/github/callback`
 const PORT = process.env.OSM_PORT
 
 // Passport session setup.
@@ -116,7 +116,7 @@ app.get("/logout", function (req, res) {
 })
 
 app.listen(PORT, () => {
-  console.log(`Server in ascolto su http://${process.env.OSM_URL}:${process.env.OSM_PORT}`)
+  console.log(`Server in ascolto su http://${process.env.OSM_IP}:${process.env.OSM_PORT}`)
   console.log(`Callback urls su ${GITHUB_CALLBACK_URL}`)
 })
 
