@@ -41,6 +41,12 @@ passport.use(
       callbackURL: GITHUB_CALLBACK_URL,
     },
     function (accessToken, refreshToken, profile, done) {
+
+
+
+      console.log("Access Token", accessToken)
+
+
       // asynchronous verification, for effect...
       process.nextTick(function () {
         // To keep the example simple, the user's GitHub profile is returned to
