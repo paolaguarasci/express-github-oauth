@@ -26,4 +26,13 @@ https://api.github.com/users/repos
 
 e devo usare uno dei tanti metodi di autenticazione che ho a disposizione. Noi usiamo OAuth. In questo caso si parla di *installazione* perché durante la prima richiesta di autenticazione l'utente autorizza la nostra app con una serie di *scopes* che rimangono i medesimi per ogni successiva richiesta.
 
- 
+ --- 
+ ### Flow
+
+ The flow to authorize users for your app is:
+    Users are redirected to request their GitHub identity
+    Users are redirected back to your site by GitHub
+    Your app accesses the API with the user's access token
+
+--- 
+### Repo privati 
