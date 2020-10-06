@@ -16,7 +16,7 @@ const PORT = process.env.OSM_PORT
 
 const { Octokit } = require("@octokit/core")
 const { access } = require("fs")
-
+const { createTokenAuth } = require("@octokit/auth-token");
 passport.serializeUser(function (user, done) {
   done(null, user)
 })
@@ -34,17 +34,20 @@ passport.use(
       clientID: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
       callbackURL: GITHUB_CALLBACK_URL,
-      scope: ['user:email', 'repo', 'profile'],
+      scopes: ["repo", "user"],
     },
     async (accessToken, refreshToken, profile, done) => {
       profile.at = accessToken
       profile.rt = refreshToken
 
+
+
+      console.log(accessToken)
+
       octokit = new Octokit({
-        auth: accessToken
+        auth: accessToken,
+        scope: ["repo"]
       })
-
-
       process.nextTick(function () {
         return done(null, profile)
       })
@@ -82,7 +85,7 @@ app.get("/login", function (req, res) {
 
 app.get(
   "/auth/github",
-  passport.authenticate("github", { scope: ["user:email"] }),
+  passport.authenticate("github", { scope: ["user:email", 'repo'] }), // <-- Attenzione: contano SOLO questi scopes!
   function (req, res) {
     res.render("index", { user: req.user })
   }
@@ -95,8 +98,35 @@ app.get(
 
 
     let lista = await octokit.request('GET /user/repos', {
-      'visibility': 'all'
+      'visibility': 'private'
     })
+
+
+
+    const TOKEN = req.user.at
+
+    const auth = createTokenAuth(TOKEN)
+    const authentication = await auth()
+
+    const response = await octokit.request("HEAD /", {
+      headers: authentication.headers,
+    })
+    const scopes = response.headers["x-oauth-scopes"].split(/,\s+/)
+
+    if (scopes.length) {
+      console.log(
+        `"${TOKEN}" has ${scopes.length} scopes enabled: ${scopes.join(", ")}`
+      )
+    } else {
+      console.log(`"${TOKEN}" has no scopes enabled`)
+    }
+
+
+
+
+
+
+
 
     let repositoryURL = lista.data.map(e => e.url)
     req.user.repo = repositoryURL
