@@ -14,6 +14,9 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET
 const GITHUB_CALLBACK_URL = `http://${process.env.OSM_IP}:${process.env.OSM_PORT}/auth/github/callback`
 const PORT = process.env.OSM_PORT
 
+const { Octokit } = require("@octokit/core")
+const { access } = require("fs")
+
 passport.serializeUser(function (user, done) {
   done(null, user)
 })
@@ -21,7 +24,9 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (obj, done) {
   done(null, obj)
 })
-let user
+
+let octokit
+
 
 passport.use(
   new GitHubStrategy(
@@ -31,11 +36,13 @@ passport.use(
       callbackURL: GITHUB_CALLBACK_URL,
       scope: ['user:email', 'repo', 'profile'],
     },
-    async function (accessToken, refreshToken, profile, done) {
+    async (accessToken, refreshToken, profile, done) => {
+      profile.at = accessToken
+      profile.rt = refreshToken
 
-
-
-
+      octokit = new Octokit({
+        auth: accessToken
+      })
 
 
       process.nextTick(function () {
@@ -82,13 +89,19 @@ app.get(
 )
 
 app.get(
-  "/repo",
-  passport.authenticate("github", { scope: ['user:email', 'repo', 'profile'] }),
-  function (req, res) {
-    console.log("USER REPO")
-    // user.repo = res.data
-    // console.log(user.repo)
-    // res.render("repo", { user: req.user })
+  "/repo", ensureAuthenticated, async (req, res) => {
+    let urlPubblici = `https://api.github.com/user/${req.user.username}/repos`
+    let urlPrivati = `https://api.github.com/user/repos`
+
+
+    let lista = await octokit.request('GET /user/repos', {
+      'visibility': 'all'
+    })
+
+    let repositoryURL = lista.data.map(e => e.url)
+    req.user.repo = repositoryURL
+
+    res.render("repo", { user: req.user })
   }
 )
 
@@ -119,3 +132,5 @@ function ensureAuthenticated (req, res, next) {
   }
   res.redirect("/login")
 }
+
+

@@ -1,2 +1,8 @@
 <p>REPO</p>
-<p><%= JSON.stringify(user.repo) %></p>
+<ul>
+  <% user.repo.forEach(function(r){ %>
+  <ul>
+    <%= r %>
+  </ul>
+  <% }); %>
+</ul>
