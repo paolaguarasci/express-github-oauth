@@ -93,15 +93,12 @@ app.get(
 
 app.get(
   "/repo", ensureAuthenticated, async (req, res) => {
-    let urlPubblici = `https://api.github.com/user/${req.user.username}/repos`
-    let urlPrivati = `https://api.github.com/user/repos`
+    let urlPubblici = `/user/${req.user.username}/repos`
+    let urlPrivati = `/user/repos`
 
-
-    let lista = await octokit.request('GET /user/repos', {
+    let lista = await octokit.request('GET ' + urlPrivati, {
       'visibility': 'private'
     })
-
-
 
     const TOKEN = req.user.at
 
