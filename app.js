@@ -12,8 +12,8 @@ const axios = require("axios")
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET
 const GITHUB_CALLBACK_URL = `http://${process.env.OSM_IP}:${process.env.OSM_PORT}/auth/github/callback`
-const PORT = process.env.OSM_PORT
-
+// const PORT = process.env.OSM_PORT
+const PORT = 3000;
 const { Octokit } = require("@octokit/core")
 const { access } = require("fs")
 const { createTokenAuth } = require("@octokit/auth-token");
